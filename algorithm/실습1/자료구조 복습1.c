@@ -1,3 +1,5 @@
+//연결 리스트 문제!
+
 #include <stdio.h>
 #include <stdlib.h>
 
