@@ -57,103 +57,76 @@
 ↦ MST 총무게
 */
 
-
 #include<stdio.h>
-
 #include<stdlib.h>
-
 #pragma warning(disable:4996)
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) (a>b?b:a)
+#define max(a,b) (a>b?a:b)
 
-typedef struct NODE
-{
-    int a;
-    int b;
-    int w;
-}NODE;
 
-void insertionSort(NODE* G, int n)
+typedef struct EDGE
 {
-    for (int i = 1; i < n; i++)
+    int a, b, w;
+    struct EDGE* next;
+}EDGE;
+
+void sort_edge(EDGE* l, int m)
+{
+    for (int i = 1; i < m; i++)
     {
-        NODE w = G[i];
-        int idx = i - 1;
-        while (idx >= 0 && w.w > G[idx].w)
+        EDGE save = l[i];
+        int idx = i-1;
+        while (idx >= 0 && save.w < l[idx].w)//조건!
         {
-            G[idx + 1] = G[idx];
+            l[idx + 1] = l[idx];
             idx--;
         }
-        G[idx + 1] = w;
+        l[idx + 1] = save;
     }
 }
-
-void paintParents(int* p, int cur,int paint)
+int findP(int* p, int idx)
 {
-    if (p[cur] != cur) 
+    if (p[idx] != idx)
     {
-        paintParents(p, p[cur], paint);
+        p[idx] = findP(p,p[idx]);
     }
-    p[cur] = paint;
+    return p[idx];
 }
 
-int find_parents(int* p, int cur) 
-{
-    if (p[cur] != cur)
-    {
-        p[cur] = find_parents(p, p[cur]);
-    }
-    return p[cur];
-}
-
-void kruskal(NODE* list, int n, int m)
-{
-    int* parents = (int*)malloc(sizeof(int) * n);
-    for (int i = 0; i < n; i++) 
-    {
-        parents[i] = i;
-    }
-
-    int total = 0;
-    int edge_count = 0; 
-
-    for (int i = 0; i < m; i++) 
-    {
-        if (find_parents(parents, list[i].a) == find_parents(parents, list[i].b)) 
-        {
-            continue; 
-        }
-
-        int min_v = min(find_parents(parents, list[i].a), find_parents(parents, list[i].b));
-        total += list[i].w;
-
-        paintParents(parents, list[i].a, min_v);
-        paintParents(parents, list[i].b, min_v);
-        edge_count++;
-
-        if (edge_count == n - 1) 
-        {
-            break;
-        }
-    }
-
-    printf("\n%d", total);
-    free(parents);
-}
 
 int main()
 {
     int n = 0, m = 0;
     scanf("%d %d", &n, &m);
-    NODE* EDGE_list = (NODE*)malloc(sizeof(NODE)*m);
+    EDGE* edgeL = (EDGE*)malloc(sizeof(EDGE) * m);
     for (int i = 0; i < m; i++)
     {
-        int a = 0, b = 0, w = 0;
-        scanf("%d %d %d", &a, &b, &w);
-        EDGE_list[i].a = min(a, b);
-        EDGE_list[i].b = max(a, b);
-        EDGE_list[i].w = w;
+        int a = 0, b = 0,w = 0;
+        scanf("%d %d %d", &a, &b,&w);
+        edgeL[i].a = min(a, b) -1;//0베이스
+        edgeL[i].b = max(a, b) -1;//0베이스!
+        edgeL[i].w = w;
     }
-    kruskal(EDGE_list, n, m);
+    sort_edge(edgeL, m);
+    int total = 0;
+    //kruskal
+    int* parent = (int*)malloc(sizeof(int)*n);
+    for (int i = 0; i < n; i++)
+    {
+        parent[i] = i;
+    }
+    for (int i = 0; i < m; i++)
+    {
+        int pa = findP(parent, edgeL[i].a);
+        int pb = findP(parent, edgeL[i].b);
+        if (pa !=pb)
+        {
+            int minP = min(pa, pb);
+            parent[max(pa, pb)] = minP;
+            printf(" %d", edgeL[i].w);
+            total += edgeL[i].w;
+        }
+    }
+    printf("\n%d", total);
 }
