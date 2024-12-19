@@ -52,41 +52,37 @@ input1
 
 
 
-
 #include<stdio.h>
 #include<stdlib.h>
-
 #pragma warning(disable:4996)
-
+#define min(a,b) (a>b?b:a)
 typedef struct EDGE
 {
     int from;
     int to;
     int w;
 }EDGE;
-
-#define min(a,b) a>b?b:a
-
 int main()
 {
     int n = 0, m = 0, s = 0;
     scanf("%d %d %d", &n, &m, &s);
-    EDGE* l = (EDGE*)malloc(sizeof(EDGE) * m);
     int* dist = (int*)malloc(sizeof(int) * n);
     for (int i = 0; i < n; i++)
     {
         dist[i] = 100000;
     }
+    EDGE* list = (EDGE*)malloc(sizeof(EDGE) * m);
     for (int i = 0; i < m; i++)
     {
-        scanf("%d %d %d", &l[i].from, &l[i].to, &l[i].w);
+        scanf("%d %d %d", &list[i].from, &list[i].to, &list[i].w);
     }
     dist[s - 1] = 0;
-    for (int i = 0; i < n - 1; i++)
+    for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m; j++)
         {
-            dist[l[j].to - 1] = min(dist[l[j].to - 1], dist[l[j].from - 1] + l[j].w);
+            if (dist[list[j].from - 1] == 100000) continue;//해당 조건 필요!
+            dist[list[j].to - 1] = min(dist[list[j].to - 1], dist[list[j].from - 1] + list[j].w);
         }
     }
     for (int i = 0; i < n; i++)
